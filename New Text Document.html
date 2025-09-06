@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>همستر بازی — نسخه کامل</title>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#2c2c2c;
+    --card:#3a3a3a;
+    --muted:#444;
+    --btn:#555;
+    --text:#eee;
+  }
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family: sans-serif;
+    margin:0; padding:20px;
+    text-align:center;
+  }
+  h1,h2{ color:#ddd; margin:8px 0; }
+  #scoreContainer{
+    width:190px; height:54px; line-height:54px;
+    margin:0 auto 18px auto;
+    background:var(--muted); border-radius:28px; font-size:22px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.4);
+  }
+  .controls{ margin-bottom:14px; }
+  .controls button{ margin:6px; }
+
+  .section{
+    background:var(--card);
+    margin:14px auto; padding:14px;
+    border-radius:14px; box-shadow:0 4px 15px rgba(0,0,0,0.45);
+    width:90%; max-width:640px; text-align:center;
+  }
+
+  /* شاپ: ایموجی‌ها */
+  .shop .skin{
+    display:inline-block;
+    width:92px; padding:10px;
+    border-radius:12px;
+    background:var(--btn);
+    color:var(--text);
+    cursor:pointer;
+    margin:8px;
+    transition: transform .15s, box-shadow .15s, background .15s;
+    user-select:none;
+  }
+  .shop .skin .thumb{
+    font-size:36px; display:block; margin-bottom:6px;
+  }
+  .shop .skin .price{ font-size:14px; opacity:.95; }
+  .shop .skin.unlocked{ background:#737373; }
+
+  /* دکمه‌ها */
+  button{
+    background:var(--btn);
+    color:var(--text);
+    border:none; border-radius:14px;
+    padding:10px 16px; font-size:15px;
+    cursor:pointer; box-shadow:2px 2px 8px rgba(0,0,0,0.45);
+  }
+  button:hover{ transform:translateY(-3px); box-shadow:4px 6px 18px rgba(0,0,0,0.55); }
+
+  /* منطقه بازی */
+  #gameArea{ height:220px; display:flex; align-items:center; justify-content:center; }
+  #gameSkin{
+    width:150px; height:150px; display:flex; align-items:center; justify-content:center;
+    border-radius:20px; background:var(--muted); cursor:pointer; user-select:none;
+    font-size:64px; box-shadow:0 6px 20px rgba(0,0,0,0.45);
+  }
+  #gameSkin img{ width:110px; height:110px; object-fit:contain; border-radius:12px; }
+
+  select{ background:var(--btn); color:var(--text); border-radius:10px; padding:8px; border:none; font-size:15px; width:80%; margin-top:8px; }
+</style>
+</head>
+<body>
+
+<h1>همستر بازی 🐹</h1>
+<div id="scoreContainer"><span id="score">0</span></div>
+
+<div class="controls">
+  <button id="saveBtn">سیو</button>
+  <button id="restartBtn">ریستارت</button>
+</div>
+
+<div class="section shop">
+  <h2>اسکین‌ها (ایموجی)</h2>
+  <div class="skin" data-emoji="🐰" data-cost="50" data-sound="rabbit">
+    <div class="thumb">🐰</div>
+    <div class="price">۵۰</div>
+  </div>
+  <div class="skin" data-emoji="🐱" data-cost="100" data-sound="cat">
+    <div class="thumb">🐱</div>
+    <div class="price">۱۰۰</div>
+  </div>
+  <div class="skin" data-emoji="🐸" data-cost="150" data-sound="frog">
+    <div class="thumb">🐸</div>
+    <div class="price">۱۵۰</div>
+  </div>
+</div>
+
+<div class="section shop">
+  <h2>قدرت و دابل کلیکر</h2>
+  <button id="powerBtn">قدرت کلیک (+1) [10]</button>
+  <button id="doubleBtn">دابل کلیکر [50]</button>
+</div>
+
+<div class="section shop">
+  <h2>موزیک</h2>
+  <button id="buyMusicBtn">خرید ضبط [100]</button><br>
+  <select id="musicList" disabled>
+    <option value="music1.mp3">آهنگ ۱</option>
+    <option value="music2.mp3">آهنگ ۲</option>
+    <option value="music3.mp3">آهنگ ۳</option>
+    <option value="music4.mp3">آهنگ ۴</option>
+    <option value="music5.mp3">آهنگ ۵</option>
+  </select><br>
+  <button id="playMusicBtn" disabled>پخش / توقف</button>
+</div>
+
+<div class="section shop">
+  <h2>فونت‌ها</h2>
+  <button class="fontBtn" data-font="sans-serif" data-cost="0">پیش‌فرض [رایگان]</button>
+  <button class="fontBtn" data-font="Arial" data-cost="50">Arial [50]</button>
+  <button class="fontBtn" data-font="'Lalezar', cursive" data-cost="250">لاله‌زار [250]</button>
+  <button class="fontBtn" data-font="'Vazir', sans-serif" data-cost="350">سنتی [350]</button>
+</div>
+
+<div class="section">
+  <h2>بازی</h2>
+  <div id="gameArea">
+    <div id="gameSkin"><img src="coin.png" alt="coin"></div>
+  </div>
+</div>
+
+<audio id="musicPlayer" controls style="display:none"></audio>
+<audio id="sound_rabbit" src="rabbit.mp3"></audio>
+<audio id="sound_cat" src="cat.mp3"></audio>
+<audio id="sound_frog" src="frog.mp3"></audio>
+
+<script>
+let score=0, clickPower=1, doubleActive=false, musicUnlocked=false, musicPlaying=false;
+const scoreEl=document.getElementById('score');
+const gameSkinEl=document.getElementById('gameSkin');
+const skins=Array.from(document.querySelectorAll('.shop .skin'));
+const powerBtn=document.getElementById('powerBtn');
+const doubleBtn=document.getElementById('doubleBtn');
+const buyMusicBtn=document.getElementById('buyMusicBtn');
+const musicList=document.getElementById('musicList');
+const playMusicBtn=document.getElementById('playMusicBtn');
+const musicPlayer=document.getElementById('musicPlayer');
+const fontBtns=Array.from(document.querySelectorAll('.fontBtn'));
+const saveBtn=document.getElementById('saveBtn');
+const restartBtn=document.getElementById('restartBtn');
+
+const clickCounts={};
+const powerCost=10, doubleCost=50;
+
+function formatNumber(num){
+  if(num>=1e6) return (num/1e6).toFixed(1)+"M";
+  if(num>=1e3) return (num/1e3).toFixed(1)+"k";
+  return num;
+}
+function updateScoreDisplay(){ scoreEl.textContent=formatNumber(score); }
+
+let currentSkin='coin';
+function setGameSkin(key){
+  if(key==='coin'){ gameSkinEl.innerHTML='<img src="coin.png" alt="coin">'; }
+  else{ gameSkinEl.textContent=key; gameSkinEl.style.fontSize='64px'; }
+  currentSkin=key;
+}
+setGameSkin('coin'); updateScoreDisplay();
+
+gameSkinEl.addEventListener('click', ()=>{ score+=clickPower; updateScoreDisplay(); });
+
+skins.forEach(skin=>{
+  const emoji=skin.dataset.emoji;
+  const cost=parseInt(skin.dataset.cost,10);
+  const soundId=skin.dataset.sound;
+  clickCounts[emoji]=0;
+
+  skin.addEventListener('click', ()=>{
+    if(skin.classList.contains('unlocked')){
+      setGameSkin(emoji);
+      clickCounts[emoji]++;
+      if(clickCounts[emoji]>=10){
+        clickCounts[emoji]=0;
+        const audio=document.getElementById("sound_"+soundId);
+        if(audio) audio.play();
+      }
+    }else{
+      if(score>=cost){
+        score-=cost; updateScoreDisplay();
+        skin.classList.add('unlocked');
+        setGameSkin(emoji);
+        alert('اسکین خریداری شد!');
+      }else alert('امتیاز کافی نداری!');
+    }
+  });
+});
+
+powerBtn.addEventListener('click', ()=>{
+  if(score>=powerCost){ score-=powerCost; clickPower++; updateScoreDisplay(); alert('قدرت کلیک بیشتر شد!'); }
+  else alert('امتیاز کافی نداری!');
+});
+
+doubleBtn.addEventListener('click', ()=>{
+  if(score>=doubleCost){ score-=doubleCost; doubleActive=true; updateScoreDisplay(); alert('دابل کلیکر فعال شد!'); }
+  else alert('امتیاز کافی نداری!');
+});
+setInterval(()=>{ if(doubleActive){ score+=1; updateScoreDisplay(); } }, 2000);
+
+buyMusicBtn.addEventListener('click', ()=>{
+  if(score>=100){ score-=100; musicUnlocked=true; musicList.disabled=false; playMusicBtn.disabled=false; updateScoreDisplay(); alert('ضبط خریداری شد!'); }
+  else alert('امتیاز کافی نداری!');
+});
+musicList.addEventListener('change', ()=>{ musicPlayer.src=musicList.value; if(musicPlaying) musicPlayer.play(); });
+playMusicBtn.addEventListener('click', ()=>{
+  if(!musicUnlocked) return;
+  if(musicPlaying){ musicPlayer.pause(); musicPlaying=false; } else { musicPlayer.play(); musicPlaying=true; }
+});
+
+fontBtns.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const cost=parseInt(btn.dataset.cost,10); const font=btn.dataset.font;
+    if(cost===0 || score>=cost){ if(cost>0) score-=cost; updateScoreDisplay(); document.body.style.fontFamily=font; alert('فونت اعمال شد!'); }
+    else alert('امتیاز کافی نداری!');
+  });
+});
+
+function saveGame(){
+  const unlocked=skins.filter(s=>s.classList.contains('unlocked')).map(s=>s.dataset.emoji);
+  localStorage.setItem('hamsterGame', JSON.stringify({score,clickPower,doubleActive,musicUnlocked,currentSkin,unlocked,currentFont:document.body.style.fontFamily}));
+  alert('ذخیره شد!');
+}
+function loadGame(){
+  const raw=localStorage.getItem('hamsterGame'); if(!raw) return;
+  try{
+    const data=JSON.parse(raw);
+    score=data.score||0; clickPower=data.clickPower||1; doubleActive=!!data.doubleActive; musicUnlocked=!!data.musicUnlocked; currentSkin=data.currentSkin||'coin';
+    updateScoreDisplay();
+    (data.unlocked||[]).forEach(e=>{ const s=skins.find(x=>x.dataset.emoji===e); if(s) s.classList.add('unlocked'); });
+    setGameSkin(currentSkin);
+    if(musicUnlocked){ musicList.disabled=false; playMusicBtn.disabled=false; }
+    if(data.currentFont) document.body.style.fontFamily=data.currentFont;
+  }catch(e){ console.warn('load error', e); }
+}
+saveBtn.addEventListener('click', saveGame);
+restartBtn.addEventListener('click', ()=>{
+  if(!confirm('مطمئنی می‌خوای ریستارت کنی؟')) return;
+  score=0; clickPower=1; doubleActive=false; musicUnlocked=false; musicPlaying=false;
+  currentSkin='coin'; skins.forEach(s=>s.classList.remove('unlocked'));
+  updateScoreDisplay(); setGameSkin('coin');
+  musicList.disabled=true; playMusicBtn.disabled=true;
+  localStorage.removeItem('hamsterGame');
+});
+window.addEventListener('load', loadGame);
+</script>
+</body>
+</html>
